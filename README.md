@@ -13,3 +13,10 @@ Stack: React + Vite, Supabase (bază de date, autentificare, stocare), Netlify (
   Astfel mutarea pe domeniul propriu nu cere modificări de cod.
 - Orice tabel nou: RLS + grant-uri explicite în aceeași migrare (vezi `0001_app_info.sql`).
 - Cheile secrete (service_role, Brevo) nu se pun niciodată în cod sau în GitHub.
+
+## Site public (etapele 1–3)
+
+- Conținutul (texte, meniu, culori, pagini, secțiuni) stă în Supabase, nu în cod.
+- Migrări: `0002_continut_site.sql` (tabelele) și `0003_continut_initial.sql` (conținutul inițial). Se rulează în Supabase > SQL Editor, în ordine.
+- Secțiunile sunt în `src/blocks/index.jsx`; fiecare tip de secțiune are o componentă și este înregistrat în `REGISTRY`.
+- Culorile se schimbă din `setari_site` (cheia `design`) și se aplică pe tot site-ul.

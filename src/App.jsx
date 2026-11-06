@@ -1,45 +1,55 @@
 import { useEffect, useState } from 'react'
-import { supabase, supabaseConfigured } from './lib/supabase.js'
-import { SITE_URL, APP_NAME } from './lib/config.js'
+import { Routes, Route } from 'react-router-dom'
+import { supabaseConfigured } from './lib/supabase.js'
+import { fetchSettings } from './lib/content.js'
+import { SiteContext } from './components/SiteContext.jsx'
+import Layout from './components/Layout.jsx'
+import { PageView, NewsArticle, NotFound, ComingSoon } from './pages/Pages.jsx'
 
-// Pagină temporară de verificare: confirmă că GitHub -> Netlify -> Supabase sunt legate corect.
-// O înlocuim cu site-ul public în pasul următor.
+// Aplică culorile din baza de date (setari_site.design) ca variabile CSS.
+function applyDesign(design = {}) {
+  const root = document.documentElement
+  for (const [k, v] of Object.entries(design)) root.style.setProperty(`--${k}`, v)
+}
+
 export default function App() {
-  const [db, setDb] = useState({ state: 'loading', message: 'Se verifică...' })
+  const [state, setState] = useState({ loading: true, settings: null, error: null })
 
   useEffect(() => {
-    async function check() {
-      if (!supabaseConfigured) {
-        setDb({
-          state: 'error',
-          message: 'Lipsesc variabilele VITE_SUPABASE_URL și VITE_SUPABASE_ANON_KEY (se setează în Netlify).',
-        })
-        return
-      }
-      const { data, error } = await supabase.from('app_info').select('cheie, valoare')
-      if (error) {
-        setDb({ state: 'error', message: `Conectat la Supabase, dar citirea a eșuat: ${error.message}` })
-        return
-      }
-      const mesaj = data.find((r) => r.cheie === 'mesaj_verificare')
-      setDb({ state: 'ok', message: mesaj ? mesaj.valoare : 'Conexiune reușită.' })
+    if (!supabaseConfigured) {
+      setState({ loading: false, settings: null, error: new Error('Lipsesc variabilele VITE_SUPABASE_URL și VITE_SUPABASE_ANON_KEY din Netlify.') })
+      return
     }
-    check()
+    fetchSettings()
+      .then((settings) => {
+        applyDesign(settings.design)
+        setState({ loading: false, settings, error: null })
+      })
+      .catch((error) => setState({ loading: false, settings: null, error }))
   }, [])
 
-  return (
-    <main className="page">
-      <h1>{APP_NAME}</h1>
-      <p className="muted">Pagină de verificare tehnică</p>
+  if (state.loading) return <div className="boot">Se încarcă…</div>
+  if (state.error)
+    return (
+      <div className="boot">
+        <h1>Site-ul nu poate fi afișat încă</h1>
+        <p>{state.error.message}</p>
+        <p className="small">Dacă tocmai ai configurat baza de date, verifică că ai rulat fișierele 0002 și 0003 din folderul supabase/migrations în Supabase (SQL Editor).</p>
+      </div>
+    )
 
-      <ul className="checks">
-        <li className="ok">
-          <strong>Netlify:</strong> aplicația rulează pe <code>{SITE_URL}</code>
-        </li>
-        <li className={db.state}>
-          <strong>Supabase:</strong> {db.message}
-        </li>
-      </ul>
-    </main>
+  return (
+    <SiteContext.Provider value={{ settings: state.settings }}>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route index element={<PageView slug="acasa" />} />
+          <Route path="noutati/:slug" element={<NewsArticle />} />
+          <Route path="cont" element={<ComingSoon titlu="Contul meu" />} />
+          <Route path="cont/nou" element={<ComingSoon titlu="Creează cont" />} />
+          <Route path=":slug" element={<PageView />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </SiteContext.Provider>
   )
 }
