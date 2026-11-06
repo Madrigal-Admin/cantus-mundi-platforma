@@ -1,0 +1,12 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Aplicație cu o singură pagină: orice adresă se deschide prin index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
