@@ -236,3 +236,36 @@ input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px so
 .region select { font: inherit; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 .plain { list-style: none; padding: 0; margin: 0; font-size: 14px; }
 .link-btn { background: none; border: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; font-size: 13px; }
+
+/* Panoul platformei (cadrul comun al tuturor rolurilor) */
+.pl { display: flex; flex-wrap: wrap; min-height: 100vh; background: var(--cream); }
+.pl-side { flex: 0 0 288px; background: #fff; border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; box-sizing: border-box; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.pl-brand { padding: 0 14px 16px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.pl-brand a { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--accent); }
+.pl-role { display: block; width: fit-content; margin-top: 8px; background: var(--peach); color: var(--deep); font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px; }
+.pl-side nav a, .pl-user a { display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 14px; border-radius: 8px; font-size: 14px; font-weight: 600; color: var(--ink); }
+.pl-side nav a:hover, .pl-user a:hover { background: var(--sand); opacity: 1; }
+.pl-side a.on { background: var(--peach); color: var(--deep); }
+.pl-ic { width: 18px; height: 18px; flex: 0 0 18px; }
+.pl-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 8px; }
+.pl-grp { width: 100%; display: flex; justify-content: space-between; background: none; border: 0; cursor: pointer; font: inherit; padding: 18px 14px 6px; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.pl-user { margin-top: auto; border-top: 1px solid var(--line); padding-top: 10px; }
+.pl-user small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+.pl-viewas { display: block; padding: 8px 14px 0; font-size: 12px; font-weight: 700; color: var(--muted); }
+.pl-viewas select { display: block; width: 100%; margin-top: 4px; font: inherit; font-size: 14px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+.pl-out { margin: 8px 14px 0; background: none; border: 0; padding: 8px 0; color: var(--deep); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; }
+.pl-toggle { display: none; width: 100%; background: #fff; border: 0; border-bottom: 1px solid var(--line); padding: 14px 20px; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.pl-main { flex: 999 1 560px; min-width: 0; padding: 36px 40px 56px; display: flex; flex-direction: column; gap: 24px; }
+.pl-head h1 { font-size: 36px; line-height: 1.05; font-weight: 800; letter-spacing: -.03em; }
+.pl-head p { margin-top: 8px; color: var(--muted); font-size: 16px; }
+.pl-preview { background: #fff1d6; border: 1px solid #ecd49a; border-radius: 8px; padding: 12px 16px; font-size: 14px; }
+.pl-cards { display: flex; flex-wrap: wrap; gap: 16px; }
+.pl-card { flex: 1 1 200px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 20px; color: var(--muted); font-size: 14px; }
+.pl-card .n { font-size: 40px; font-weight: 800; letter-spacing: -.03em; color: var(--accent); line-height: 1; margin-bottom: 8px; }
+.pl-form { max-width: 560px; }
+@media (max-width: 900px) {
+  .pl-toggle { display: block; }
+  .pl-side { display: none; flex-basis: 100%; position: static; height: auto; }
+  .pl-side.open { display: flex; }
+  .pl-main { padding: 24px 20px 40px; }
+}

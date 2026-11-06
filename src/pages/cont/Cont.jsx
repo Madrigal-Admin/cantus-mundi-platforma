@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase.js'
 import { SITE_URL } from '../../lib/config.js'
-import { useAuth, ROLURI, STATUSURI } from '../../auth/AuthContext.jsx'
+import { useAuth } from '../../auth/AuthContext.jsx'
 
 const mesajEroare = (e) => {
   const m = (e?.message || '').toLowerCase()
@@ -41,7 +41,7 @@ export function Login() {
   const [eroare, setEroare] = useState('')
   const [ocupat, setOcupat] = useState(false)
 
-  if (!loading && user) return <Navigate to="/cont/panou" replace />
+  if (!loading && user) return <Navigate to="/platforma" replace />
 
   async function trimite(e) {
     e.preventDefault()
@@ -50,7 +50,7 @@ export function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: parola })
     setOcupat(false)
     if (error) return setEroare(mesajEroare(error))
-    navigate('/cont/panou')
+    navigate('/platforma')
   }
 
   return (
@@ -194,7 +194,7 @@ export function ParolaNoua() {
       {gata ? (
         <>
           <p className="rich">Parola a fost schimbată.</p>
-          <Link className="btn btn-primary mt" to="/cont/panou">Mergi în cont</Link>
+          <Link className="btn btn-primary mt" to="/platforma">Mergi în cont</Link>
         </>
       ) : (
         <form className="form" onSubmit={trimite}>
@@ -203,64 +203,6 @@ export function ParolaNoua() {
           <button className="btn btn-primary">Salvează parola</button>
         </form>
       )}
-    </Pagina>
-  )
-}
-
-export function Panou() {
-  const { profil, user, esteAdmin, esteReprezentant, reincarca, iesire } = useAuth()
-  const [f, setF] = useState(null)
-  const [mesaj, setMesaj] = useState('')
-
-  useEffect(() => {
-    if (profil) setF({ nume: profil.nume || '', telefon: profil.telefon || '', localitate: profil.localitate || '', institutie: profil.institutie || '' })
-  }, [profil])
-
-  async function salveaza(e) {
-    e.preventDefault()
-    setMesaj('')
-    const { error } = await supabase.from('profile').update(f).eq('id', user.id)
-    if (error) return setMesaj('Nu s-au putut salva modificările.')
-    await reincarca()
-    setMesaj('Modificările au fost salvate.')
-  }
-
-  if (!profil || !f)
-    return (
-      <Pagina titlu="Contul meu">
-        <p className="muted">Profilul nu a putut fi încărcat. Dacă ai creat contul recent, reîncarcă pagina.</p>
-        <button className="btn btn-outline mt" onClick={iesire}>Ieși din cont</button>
-      </Pagina>
-    )
-
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value })
-  return (
-    <Pagina titlu={`Bun venit${profil.nume ? ', ' + profil.nume.split(' ')[0] : ''}`}>
-      <div className={`alert ${profil.status === 'aprobat' ? 'alert-ok' : 'alert-info'}`}>
-        <strong>{ROLURI[profil.rol]}</strong> · {STATUSURI[profil.status]}
-        <p>
-          {profil.status === 'in_asteptare' && 'Contul tău așteaptă aprobarea reprezentantului Cantus Mundi din județul tău. Vei putea folosi platforma imediat după aprobare.'}
-          {profil.status === 'respins' && 'Cererea de cont nu a fost aprobată. Poți scrie echipei Cantus Mundi pentru detalii.'}
-          {profil.status === 'inactiv' && 'Contul este dezactivat.'}
-          {profil.status === 'aprobat' && 'Contul este activ. Funcțiile pentru coruri, evenimente și materiale vor apărea aici în etapele următoare.'}
-        </p>
-      </div>
-
-      {(esteAdmin || esteReprezentant) && (
-        <p className="mt"><Link className="btn btn-primary" to="/admin">Deschide panoul de administrare</Link></p>
-      )}
-
-      <h2 className="sub">Datele tale</h2>
-      <form className="form" onSubmit={salveaza}>
-        <label>E-mail (nu se poate schimba aici)<input value={profil.email} disabled /></label>
-        <label>Nume și prenume<input value={f.nume} onChange={set('nume')} required /></label>
-        <label>Telefon<input value={f.telefon} onChange={set('telefon')} /></label>
-        <label>Localitate<input value={f.localitate} onChange={set('localitate')} /></label>
-        <label>Școala sau instituția<input value={f.institutie} onChange={set('institutie')} /></label>
-        {mesaj && <div className="alert alert-info" role="status">{mesaj}</div>}
-        <button className="btn btn-primary">Salvează</button>
-      </form>
-      <p className="mt"><button className="btn btn-outline" onClick={iesire}>Ieși din cont</button></p>
     </Pagina>
   )
 }

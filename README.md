@@ -9,14 +9,21 @@ Stack: React + Vite, Supabase (bază de date, autentificare, stocare), Netlify (
 - `.env.example` – numele variabilelor de mediu necesare (valorile se pun în Netlify, nu în cod)
 
 ## Reguli de proiect
-- Nicio adresă de site nu se scrie în cod; se folosește `SITE_URL` din `src/lib/config.js`.
-  Astfel mutarea pe domeniul propriu nu cere modificări de cod.
-- Orice tabel nou: RLS + grant-uri explicite în aceeași migrare (vezi `0001_app_info.sql`).
-- Cheile secrete (service_role, Brevo) nu se pun niciodată în cod sau în GitHub.
+Regulile complete (la fiecare modificare, la baza de date, secrete, mentenanță) sunt în `docs/IGIENA-TEHNICA.md`. Pe scurt:
+- `npm run lint` și `npm run build` trec înainte de fiecare livrare.
+- Cod nefolosit se șterge; redirecturile se țin doar pentru adrese folosite public.
+- Orice tabel nou: RLS + grant-uri explicite în aceeași migrare, iar drepturile se impun în baza de date.
+- Nicio adresă de site în cod (`SITE_URL`) și nicio cheie secretă în GitHub.
 
-## Site public (etapele 1–3)
+## Ce conține
+- Site public: pagini și secțiuni din Supabase (migrările 0002, 0003). Secțiunile sunt în `src/blocks/index.jsx`, înregistrate în `REGISTRY`.
+- Conturi, roluri, regiuni, județe (migrarea 0004). Rolurile: Admin General, Reprezentant Zonal, Dirijor, Corist.
+- Platforma la `/platforma`: un cadru comun, cu meniu pe roluri în `src/platforma/menu.js`. Secțiunile marcate `soon: true` sunt încă neconstruite.
+- Culorile site-ului se schimbă din `setari_site` (cheia `design`).
+- `0001_app_info.sql` rămâne doar ca istoric (tabel de verificare a legăturii inițiale).
 
-- Conținutul (texte, meniu, culori, pagini, secțiuni) stă în Supabase, nu în cod.
-- Migrări: `0002_continut_site.sql` (tabelele) și `0003_continut_initial.sql` (conținutul inițial). Se rulează în Supabase > SQL Editor, în ordine.
-- Secțiunile sunt în `src/blocks/index.jsx`; fiecare tip de secțiune are o componentă și este înregistrat în `REGISTRY`.
-- Culorile se schimbă din `setari_site` (cheia `design`) și se aplică pe tot site-ul.
+## Comenzi
+- `npm install` – instalează dependențele
+- `npm run dev` – rulează local
+- `npm run lint` – verifică codul
+- `npm run build` – construiește pentru publicare

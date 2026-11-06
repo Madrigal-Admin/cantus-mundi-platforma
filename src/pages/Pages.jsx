@@ -28,20 +28,6 @@ export function NotFound() {
   )
 }
 
-export function ComingSoon({ titlu }) {
-  useEffect(() => setSeo(titlu), [titlu])
-  return (
-    <section className="page-hero">
-      <div className="container">
-        <div className="eyebrow">Platforma Cantus Mundi</div>
-        <h1 className="title">{titlu}</h1>
-        <p className="lead">Platforma cu conturi se construiește în etapa următoare. Revino curând.</p>
-        <Link className="btn btn-primary" to="/">Înapoi la prima pagină</Link>
-      </div>
-    </section>
-  )
-}
-
 export function PageView({ slug: fixed }) {
   const params = useParams()
   const slug = fixed || params.slug

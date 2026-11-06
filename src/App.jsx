@@ -5,10 +5,14 @@ import { fetchSettings } from './lib/content.js'
 import { SiteContext } from './components/SiteContext.jsx'
 import Layout from './components/Layout.jsx'
 import { PageView, NewsArticle, NotFound } from './pages/Pages.jsx'
+import { Login, Inregistrare, Resetare, ParolaNoua } from './pages/cont/Cont.jsx'
 import { AuthProvider } from './auth/AuthContext.jsx'
 import Protejat from './auth/Protejat.jsx'
-import { Login, Inregistrare, Resetare, ParolaNoua, Panou } from './pages/cont/Cont.jsx'
-import Admin from './pages/admin/Admin.jsx'
+import DoarStaff from './auth/DoarStaff.jsx'
+import Shell from './platforma/Shell.jsx'
+import { Acasa, InCurand, Roluri, Profil } from './platforma/pages.jsx'
+import { Utilizatori } from './platforma/Conturi.jsx'
+import { Regiuni } from './platforma/Regiuni.jsx'
 
 // Aplică culorile din baza de date (setari_site.design) ca variabile CSS.
 function applyDesign(design = {}) {
@@ -38,27 +42,36 @@ export default function App() {
       <div className="boot">
         <h1>Site-ul nu poate fi afișat încă</h1>
         <p>{state.error.message}</p>
-        <p className="small">Dacă tocmai ai configurat baza de date, verifică că ai rulat fișierele 0002 și 0003 din folderul supabase/migrations în Supabase (SQL Editor).</p>
+        <p className="small">Dacă tocmai ai configurat baza de date, verifică că ai rulat fișierele din folderul supabase/migrations în Supabase (SQL Editor), în ordine.</p>
       </div>
     )
 
   return (
     <SiteContext.Provider value={{ settings: state.settings }}>
       <AuthProvider>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<PageView slug="acasa" />} />
-          <Route path="noutati/:slug" element={<NewsArticle />} />
-          <Route path="cont" element={<Login />} />
-          <Route path="cont/nou" element={<Inregistrare />} />
-          <Route path="cont/resetare" element={<Resetare />} />
-          <Route path="cont/parola-noua" element={<ParolaNoua />} />
-          <Route path="cont/panou" element={<Protejat><Panou /></Protejat>} />
-          <Route path="admin" element={<Protejat doarStaff><Admin /></Protejat>} />
-          <Route path=":slug" element={<PageView />} />
-          <Route path="*" element={<NotFound />} />
-        </Route>
-      </Routes>
+        <Routes>
+          {/* Site public */}
+          <Route element={<Layout />}>
+            <Route index element={<PageView slug="acasa" />} />
+            <Route path="noutati/:slug" element={<NewsArticle />} />
+            <Route path="cont" element={<Login />} />
+            <Route path="cont/nou" element={<Inregistrare />} />
+            <Route path="cont/resetare" element={<Resetare />} />
+            <Route path="cont/parola-noua" element={<ParolaNoua />} />
+            <Route path=":slug" element={<PageView />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+
+          {/* Platforma (cu autentificare), același cadru pentru toate rolurile */}
+          <Route path="platforma" element={<Protejat><Shell /></Protejat>}>
+            <Route index element={<Acasa />} />
+            <Route path="conturi" element={<DoarStaff><Utilizatori /></DoarStaff>} />
+            <Route path="regiuni" element={<DoarStaff doarAdmin><Regiuni /></DoarStaff>} />
+            <Route path="roluri" element={<DoarStaff doarAdmin><Roluri /></DoarStaff>} />
+            <Route path="profil" element={<Profil />} />
+            <Route path="*" element={<InCurand />} />
+          </Route>
+        </Routes>
       </AuthProvider>
     </SiteContext.Provider>
   )
