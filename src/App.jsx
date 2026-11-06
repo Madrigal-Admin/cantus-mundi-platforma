@@ -4,7 +4,11 @@ import { supabaseConfigured } from './lib/supabase.js'
 import { fetchSettings } from './lib/content.js'
 import { SiteContext } from './components/SiteContext.jsx'
 import Layout from './components/Layout.jsx'
-import { PageView, NewsArticle, NotFound, ComingSoon } from './pages/Pages.jsx'
+import { PageView, NewsArticle, NotFound } from './pages/Pages.jsx'
+import { AuthProvider } from './auth/AuthContext.jsx'
+import Protejat from './auth/Protejat.jsx'
+import { Login, Inregistrare, Resetare, ParolaNoua, Panou } from './pages/cont/Cont.jsx'
+import Admin from './pages/admin/Admin.jsx'
 
 // Aplică culorile din baza de date (setari_site.design) ca variabile CSS.
 function applyDesign(design = {}) {
@@ -40,16 +44,22 @@ export default function App() {
 
   return (
     <SiteContext.Provider value={{ settings: state.settings }}>
+      <AuthProvider>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<PageView slug="acasa" />} />
           <Route path="noutati/:slug" element={<NewsArticle />} />
-          <Route path="cont" element={<ComingSoon titlu="Contul meu" />} />
-          <Route path="cont/nou" element={<ComingSoon titlu="Creează cont" />} />
+          <Route path="cont" element={<Login />} />
+          <Route path="cont/nou" element={<Inregistrare />} />
+          <Route path="cont/resetare" element={<Resetare />} />
+          <Route path="cont/parola-noua" element={<ParolaNoua />} />
+          <Route path="cont/panou" element={<Protejat><Panou /></Protejat>} />
+          <Route path="admin" element={<Protejat doarStaff><Admin /></Protejat>} />
           <Route path=":slug" element={<PageView />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      </AuthProvider>
     </SiteContext.Provider>
   )
 }
