@@ -164,6 +164,7 @@ p { margin: 0; }
 input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 6px; background: #fff; margin-top: 6px; }
 .inline-form { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
 .inline-form input { flex: 1 1 220px; margin: 0; }
+.inline-form select { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 
 /* Subsol */
 .footer { background: var(--deep); color: #fff; padding: 64px 0 28px; margin-top: 0; }
@@ -181,18 +182,28 @@ input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px so
 .footer-legal { display: flex; gap: 20px; flex-wrap: wrap; }
 
 /* Telefon / tabletă */
-@media (max-width: 900px) {
-  .container { padding: 0 24px; }
+/* Antetul: pe ecrane mai înguste decât 1360px meniul se strânge sub butonul „Meniu”, ca antetul să rămână îngust. */
+@media (max-width: 1359px) {
   .header-inner { padding: 12px 24px; }
-  .hero-wrap { padding: 20px 24px 0; }
-  .hero-text { padding: 40px 28px; }
   .menu-toggle { display: block; }
   .nav { display: none; width: 100%; flex-direction: column; align-items: stretch; padding-bottom: 12px; }
   .nav.open { display: flex; }
-  .nav-list { flex-direction: column; }
+  .nav-list { flex-direction: column; flex-wrap: nowrap; }
   .submenu { position: static; display: block; border: 0; box-shadow: none; padding: 0 0 0 14px; }
   .nav-buttons { flex-direction: column; }
   .nav-buttons .btn { text-align: center; }
+  .account-name { max-width: none; padding: 8px 0; }
+}
+@media (min-width: 1360px) {
+  .header-inner { flex-wrap: nowrap; padding: 10px 32px; }
+  .nav { flex-wrap: nowrap; gap: 18px; }
+  .nav-list { flex-wrap: nowrap; gap: 18px; }
+  .nav-buttons { flex-wrap: nowrap; }
+}
+@media (max-width: 900px) {
+  .container { padding: 0 24px; }
+  .hero-wrap { padding: 20px 24px 0; }
+  .hero-text { padding: 40px 28px; }
   .section { padding: 48px 0; }
   .two-col { padding: 56px 0; }
   .stat { padding-left: 0; border-left: 0; }
@@ -225,7 +236,8 @@ input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px so
 .table th, .table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
 .table th { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .table select { font: inherit; padding: 6px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
-.row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+div.row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+td.row-actions .btn { margin: 0 8px 6px 0; }
 .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--sand); }
 .badge-aprobat { background: #e0f1e6; color: #1f6b3a; }
 .badge-in_asteptare { background: #fff1d6; color: #7a5200; }
@@ -238,8 +250,8 @@ input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px so
 .link-btn { background: none; border: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; font-size: 13px; }
 
 /* Panoul platformei (cadrul comun al tuturor rolurilor) */
-.pl { display: flex; flex-wrap: wrap; min-height: 100vh; background: var(--cream); }
-.pl-side { flex: 0 0 288px; background: #fff; border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; box-sizing: border-box; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.pl { display: flex; flex-wrap: wrap; background: var(--cream); }
+.pl-side { flex: 0 0 288px; background: #fff; border-right: 1px solid var(--line); padding: 20px 14px; display: flex; flex-direction: column; box-sizing: border-box; position: sticky; overflow-y: auto; }
 .pl-brand { padding: 0 14px 16px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
 .pl-brand a { font-size: 20px; font-weight: 800; letter-spacing: -.02em; color: var(--accent); }
 .pl-role { display: block; width: fit-content; margin-top: 8px; background: var(--peach); color: var(--deep); font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px; }
@@ -269,3 +281,23 @@ input, textarea { width: 100%; font: inherit; padding: 12px 14px; border: 1px so
   .pl-side.open { display: flex; }
   .pl-main { padding: 24px 20px 40px; }
 }
+
+/* Platformă: ajustări (antet fix, ajutor, formulare de regiuni) */
+.account-name { font-size: 13px; font-weight: 700; color: var(--ink); align-self: center; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pl { min-height: calc(100vh - var(--header-h, 66px)); }
+@media (min-width: 901px) { .pl-side { top: var(--header-h, 66px); height: calc(100vh - var(--header-h, 66px)); } }
+.pl-brand { border-bottom: 0; padding-bottom: 8px; }
+.pl-help { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; font-size: 14px; }
+.pl-help summary { cursor: pointer; font-weight: 700; }
+.pl-help p { margin-top: 8px; color: var(--muted); line-height: 1.5; }
+.checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 4px 16px; margin-top: 10px; }
+.checks .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; font-weight: 500; min-height: 32px; }
+.checks .check input { width: auto; margin: 4px 0 0; }
+.checks small { color: var(--muted); }
+.card-form { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 24px; display: grid; gap: 20px; }
+.card-form h2 { font-size: 22px; font-weight: 800; }
+.card-form .field { display: grid; font-size: 14px; font-weight: 600; max-width: 420px; }
+.card-form fieldset { border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+.card-form legend { font-size: 13px; font-weight: 700; padding: 0 8px; }
+.card-form .search { max-width: 320px; margin: 0; }
+.danger { color: #8c1d12; border-color: #8c1d12; }

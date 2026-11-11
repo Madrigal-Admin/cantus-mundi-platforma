@@ -10,6 +10,12 @@ export const ROLURI = {
   dirijor: 'Dirijor',
   corist: 'Corist',
 }
+// Admini = angajații care gestionează platforma; Utilizatori = Dirijorii și Coriștii.
+export const ROLURI_ADMIN = ['admin_general', 'reprezentant_zonal']
+export const esteRolAdmin = (rol) => ROLURI_ADMIN.includes(rol)
+export const etichetaRol = (rol) =>
+  rol === 'admin_general' ? 'Admin General' : `${esteRolAdmin(rol) ? 'Admin' : 'Utilizator'} · ${ROLURI[rol]}`
+
 export const STATUSURI = {
   in_asteptare: 'În așteptare',
   aprobat: 'Aprobat',

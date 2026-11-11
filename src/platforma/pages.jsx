@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase.js'
-import { useAuth, ROLURI, STATUSURI } from '../auth/AuthContext.jsx'
-import { DESCRIERI, MENIURI } from './menu.js'
+import { useAuth, ROLURI, STATUSURI, etichetaRol, esteRolAdmin } from '../auth/AuthContext.jsx'
+import { DESCRIERI, MENIURI, menuPentru } from './menu.js'
 
 export function PageHeader({ titlu, text, children }) {
   useEffect(() => {
@@ -20,52 +20,49 @@ export function PageHeader({ titlu, text, children }) {
 }
 
 export function Acasa() {
-  const { profil, esteAdmin, esteReprezentant } = useAuth()
+  const { profil, esteAdmin } = useAuth()
   const [n, setN] = useState({ pending: 0, aprobati: 0, regiuni: 0 })
-  const staff = esteAdmin || esteReprezentant
 
   useEffect(() => {
-    if (!staff) return
     Promise.all([
-      supabase.from('profile').select('id', { count: 'exact', head: true }).eq('status', 'in_asteptare').eq('rol', 'dirijor'),
-      supabase.from('profile').select('id', { count: 'exact', head: true }).eq('status', 'aprobat').eq('rol', 'dirijor'),
+      supabase.from('profile').select('id', { count: 'exact', head: true }).eq('status', 'in_asteptare').in('rol', ['dirijor', 'corist']),
+      supabase.from('profile').select('id', { count: 'exact', head: true }).eq('status', 'aprobat').in('rol', ['dirijor', 'corist']),
       supabase.from('regiuni').select('id', { count: 'exact', head: true }),
     ]).then(([a, b, c]) => setN({ pending: a.count || 0, aprobati: b.count || 0, regiuni: c.count || 0 }))
-  }, [staff])
+  }, [])
 
   const prenume = (profil?.nume || '').split(' ')[0]
   return (
     <>
-      <PageHeader titlu={`Bun venit${prenume ? ', ' + prenume : ''}`} text={`${ROLURI[profil.rol]} · ${STATUSURI[profil.status]}`} />
-      {profil.status === 'in_asteptare' && (
-        <div className="alert alert-info">Contul tău așteaptă aprobarea reprezentantului Cantus Mundi din județul tău. Vei putea folosi platforma imediat după aprobare.</div>
-      )}
-      {staff && (
-        <>
-          <section className="pl-cards">
-            <Link to="/platforma/conturi" className="pl-card">
-              <div className="n">{n.pending}</div>
-              <div>conturi de dirijori de aprobat</div>
-            </Link>
-            <div className="pl-card">
-              <div className="n">{n.aprobati}</div>
-              <div>dirijori aprobați</div>
-            </div>
-            {esteAdmin && (
-              <Link to="/platforma/regiuni" className="pl-card">
-                <div className="n">{n.regiuni}</div>
-                <div>regiuni definite</div>
-              </Link>
-            )}
-          </section>
-          <p className="note">Statisticile despre coruri, coriști și evenimente apar aici după ce construim acele secțiuni.</p>
-        </>
-      )}
-      {!staff && profil.status === 'aprobat' && (
-        <div className="alert alert-ok">Contul este activ. Secțiunile din meniu apar aici pe măsură ce sunt construite.</div>
-      )}
+      <PageHeader titlu={`Bun venit${prenume ? ', ' + prenume : ''}`} text={`${etichetaRol(profil.rol)}. Imaginea de ansamblu a platformei.`} />
+      <section className="pl-cards">
+        <Link to="/platforma/conturi" className="pl-card">
+          <div className="n">{n.pending}</div>
+          <div>conturi de utilizatori de aprobat</div>
+        </Link>
+        <div className="pl-card">
+          <div className="n">{n.aprobati}</div>
+          <div>utilizatori aprobați</div>
+        </div>
+        {esteAdmin && (
+          <Link to="/platforma/regiuni" className="pl-card">
+            <div className="n">{n.regiuni}</div>
+            <div>regiuni definite</div>
+          </Link>
+        )}
+      </section>
+      <p className="note">Statisticile despre coruri, coriști și evenimente apar aici după ce construim acele secțiuni.</p>
     </>
   )
+}
+
+// Pagina de start a platformei: Prezentare generală pentru admini; utilizatorii merg direct la prima lor secțiune.
+export function Index() {
+  const { profil, esteAdmin, esteReprezentant } = useAuth()
+  if (esteAdmin || esteReprezentant) return <Acasa />
+  const rol = profil.status === 'aprobat' || !esteRolAdmin(profil.rol) ? profil.rol : 'dirijor'
+  const prima = menuPentru(rol).find((e) => e.grup)?.items[0]?.path || '/platforma/profil'
+  return <Navigate to={prima} replace />
 }
 
 export function InCurand() {
@@ -77,41 +74,6 @@ export function InCurand() {
     <>
       <PageHeader titlu={titlu} text="Această secțiune se construiește într-una din etapele următoare." />
       <div className="alert alert-info">{DESCRIERI[id] || 'Detalii în curând.'}</div>
-    </>
-  )
-}
-
-const MATRICE = [
-  ['Gestionează site-ul public', 'Da', '–', '–', '–'],
-  ['Creează regiuni și atribuie județe', 'Da', '–', '–', '–'],
-  ['Vede toate conturile', 'Da', 'Doar regiunea lui', '–', '–'],
-  ['Aprobă dirijori', 'Da', 'Din regiunea lui', '–', '–'],
-  ['Schimbă roluri', 'Da', '–', '–', '–'],
-  ['Înregistrează coruri și coriști', 'Da', '–', 'Da (dirijor principal)', '–'],
-  ['Vede calendarul și materialele', 'Da', 'Da', 'Da', 'Da'],
-]
-
-export function Roluri() {
-  return (
-    <>
-      <PageHeader titlu="Roluri și drepturi" text="Cele patru roluri ale platformei și ce poate face fiecare. Rolul unui cont se schimbă din „Conturi și aprobări”." />
-      <div className="table-wrap">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Drept</th><th>Admin General</th><th>Reprezentant Zonal</th><th>Dirijor</th><th>Corist</th>
-            </tr>
-          </thead>
-          <tbody>
-            {MATRICE.map((r) => (
-              <tr key={r[0]}>
-                {r.map((c, i) => (i === 0 ? <td key={i}><strong>{c}</strong></td> : <td key={i}>{c}</td>))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <p className="note">Tabelul descrie regulile actuale. Rolurile sunt aplicate de baza de date, nu doar de meniu.</p>
     </>
   )
 }

@@ -10,8 +10,8 @@ import { AuthProvider } from './auth/AuthContext.jsx'
 import Protejat from './auth/Protejat.jsx'
 import DoarStaff from './auth/DoarStaff.jsx'
 import Shell from './platforma/Shell.jsx'
-import { Acasa, InCurand, Roluri, Profil } from './platforma/pages.jsx'
-import { Utilizatori } from './platforma/Conturi.jsx'
+import { Index, InCurand, Profil } from './platforma/pages.jsx'
+import { Conturi } from './platforma/Conturi.jsx'
 import { Regiuni } from './platforma/Regiuni.jsx'
 
 // Aplică culorile din baza de date (setari_site.design) ca variabile CSS.
@@ -64,10 +64,9 @@ export default function App() {
 
           {/* Platforma (cu autentificare), același cadru pentru toate rolurile */}
           <Route path="platforma" element={<Protejat><Shell /></Protejat>}>
-            <Route index element={<Acasa />} />
-            <Route path="conturi" element={<DoarStaff><Utilizatori /></DoarStaff>} />
+            <Route index element={<Index />} />
+            <Route path="conturi" element={<DoarStaff><Conturi /></DoarStaff>} />
             <Route path="regiuni" element={<DoarStaff doarAdmin><Regiuni /></DoarStaff>} />
-            <Route path="roluri" element={<DoarStaff doarAdmin><Roluri /></DoarStaff>} />
             <Route path="profil" element={<Profil />} />
             <Route path="*" element={<InCurand />} />
           </Route>
